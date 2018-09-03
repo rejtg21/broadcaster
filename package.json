@@ -1,0 +1,28 @@
+{
+  "name": "broadcaster",
+  "version": "0.1.0",
+  "description": "A nodejs server to client and client to server communication.",
+  "main": "src/",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/rejtg21/broadcaster.git"
+  },
+  "keywords": [
+    "nodejs",
+    "broadcast",
+    "server-to-client",
+    "client-to-server"
+  ],
+  "author": "Rej Mediodia (rejtg21@gmail.com)",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/rejtg21/broadcaster/issues"
+  },
+  "homepage": "https://github.com/rejtg21/broadcaster#readme",
+  "devDependencies": {
+    "require-all": "^3.0.0"
+  }
+}

@@ -1,5 +1,5 @@
 {
-  "name": "broadcaster",
+  "name": "resm-broadcaster",
   "version": "0.1.0",
   "description": "A nodejs server to client and client to server communication.",
   "main": "src/",
@@ -12,6 +12,8 @@
   },
   "keywords": [
     "nodejs",
+    "adonis",
+    "socket-io",
     "broadcast",
     "server-to-client",
     "client-to-server"

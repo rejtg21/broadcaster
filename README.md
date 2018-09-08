@@ -11,6 +11,7 @@ A nodejs broadcasting library that focus with server to client and client to ser
 ## Current Driver Supported
 - [SocketIO](https://socket.io/)
 - Custom Driver is supported. You can easily extend drivers to be used.
+- AdonisJS Framework Supported.
 
 ## Usage
 
@@ -52,6 +53,7 @@ module.exports = {
 #### Bootstrap Services
 Initialize first the `BroadcastManager` and `BroadcastEvent` Service.
 
+##### Default
 `Server.js`
 ```
 const config = require('Config');
@@ -79,9 +81,67 @@ BroadcastEvent.addHook((socket) => {
 });
 ```
 
+##### AdonisJS Framework
+
+
+Define a provider to boot the setup same as below.
+
+`BroadcastServiceProvider.js`
+```
+const { ServiceProvider } = require('@adonisjs/fold')
+
+class BroadcastServiceProvider extends ServiceProvider {
+    register () {
+        const Config = use('Config');
+        let broadcastConfig = Config.get('broadcaster');
+
+        this.app.singleton('Broadcaster', () => {
+            const BroadcastManager = require('resm-broadcaster/BroadcastManager');
+
+            const Server = use('Server');
+
+            return new BroadcastManager(
+                broadcastConfig
+            );
+        });
+
+        this.app.singleton('BroadcastEvent', () => {
+            const BroadcastEvent = require('resm-broadcaster/BroadcastEvent');
+            const BroadcastManager = use('Broadcaster');
+
+            return new BroadcastEvent(
+                BroadcastManager,
+                broadcastConfig
+            );
+        });
+    }
+
+    boot() {
+        const BroadcastEvent = use('BroadcastEvent');
+        const appRoot = use('Helpers').appRoot();
+
+        const listeners = [
+            appRoot+'/app/Listeners'
+        ];
+
+        BroadcastEvent.bootListeners(listeners);
+
+        // add hook to be called in socket.
+        BroadcastEvent.addHook((socket) => {
+            socket.joinRoom('sample');
+        });
+    }
+}
+
+module.exports = BroadcastServiceProvider
+
+```
+
+
 #### Firing Events.
 After successful bootstrap `BroadCastEvent`. Create a Event file that implements the `BroadcastEventContract`. In ES6 there is no implements yet so we will utilize the extends.
 
+##### Define Event Class
 `Sample.js`
 ```
 const BroadcastEvent = require('resm-broadcaster/Contracts/BroadcastEventContract');
@@ -125,6 +185,8 @@ class Sample extends BroadcastEvent {
 
 ```
 
+##### Default Implementation
+
 `Server.js`
 
 ```
@@ -137,6 +199,30 @@ const data = {
 
 BroadCastEvent.fireEvent(new Sample(data));
 ```
+
+##### AdonisJS Implementation
+
+In any `class`/`controller` or even in the `Listener`
+`SampleController`
+```
+'use strict'
+const BroadcastEvent = use('BroadcastEvent');
+const CreatedEventClass = use('App/Events/Sample');
+class GeneralController {
+
+    save() {
+        //save logic here
+        let data = {
+            // data to be submitted
+        };
+        BroadcastEvent.fire(new CreatedEventClass(data));
+    }
+}
+
+module.exports = GeneralController;
+```
+
+##### Client Side
 All joined in channel `test` will received this in `Client.js`.
 
 ```
